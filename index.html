@@ -1,0 +1,264 @@
+git init
+git add .
+git commit -m "Initial commit"
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Pay Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px;
+      width: 250px;
+    }
+    .output {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 600px;
+      font-size: 20px;
+      line-height: 1.8;
+      text-align: left;
+    }
+    .output span.label {
+      font-weight: bold;
+      font-size: 20px;
+      display: inline-block;
+      min-width: 200px;
+    }
+    .output span.value {
+      font-size: 26px;
+      color: #00ff99;
+    }
+    #darkModeToggle, #timeModeToggle {
+      position: fixed;
+      bottom: 20px;
+      padding: 10px 15px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #darkModeToggle {
+      right: 20px;
+    }
+    #timeModeToggle {
+      right: 160px;
+    }
+    .calculator-section {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .section {
+      margin-top: 40px;
+      padding: 20px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .section h3 {
+      margin-top: 0;
+      color: #00ccff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Pay Tracker</h1>
+  <input id="wage" type="number" placeholder="Hourly Wage ($)" />
+  <button onclick="startTracking()">Start Tracking</button>
+  <button onclick="togglePause()">Pause / Resume</button>
+  <button onclick="restartTimer()">Restart Timer</button>
+  <button onclick="newSession()">New Session</button>
+
+  <div class="output">
+    <div><span class="label">Time Worked:</span> <span class="value" id="timeWorked"></span></div>
+    <div><span class="label">Money Earned:</span> <span class="value" id="moneyEarned"></span></div>
+  </div>
+
+  <div class="section">
+    <input id="goal" type="number" placeholder="Enter Goal Amount ($)" />
+    <div><span class="label">Time to Reach Goal:</span> <span class="value" id="timeToGoal"></span></div>
+  </div>
+
+  <div class="section">
+    <h3>Common Goal References (in work time):</h3>
+    <div id="presetStarbucks"></div>
+    <div id="presetCar"></div>
+    <div id="presetHouse"></div>
+  </div>
+
+  <div class="section">
+    <h3>Earnings Calculator (from Time Worked):</h3>
+    <input id="customHours" type="number" placeholder="Hours Worked" />
+    <input id="customMinutes" type="number" placeholder="Minutes Worked" />
+    <input id="customSeconds" type="number" placeholder="Seconds Worked" />
+    <button onclick="calculateCustomEarnings()">Calculate Earnings</button>
+    <div id="customEarnings"></div>
+  </div>
+
+  <button id="darkModeToggle" onclick="toggleDarkMode()">Toggle Light Mode</button>
+  <button id="timeModeToggle" onclick="toggleTimeMode()">Use Calendar Time</button>
+
+  <script>
+    let startTime = null;
+    let pausedTime = null;
+    let wagePerSecond = null;
+    let paused = false;
+    let isDarkMode = true;
+    let useCalendarTime = false;
+
+    function formatTime(seconds) {
+      if (useCalendarTime) {
+        const years = Math.floor(seconds / (365 * 86400));
+        seconds %= 365 * 86400;
+        const days = Math.floor(seconds / 86400);
+        seconds %= 86400;
+        const hrs = Math.floor(seconds / 3600);
+        seconds %= 3600;
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${years > 0 ? years + ' years, ' : ''}${days > 0 ? days + ' days, ' : ''}${hrs} hours, ${mins} minutes, ${secs} seconds`;
+      } else {
+        const hrs = Math.floor(seconds / 3600);
+        seconds %= 3600;
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${hrs} hours, ${mins} minutes, ${secs} seconds`;
+      }
+    }
+
+    function updatePresets() {
+      if (!wagePerSecond) return;
+      const starbucks = 5;
+      const car = 48000;
+      const house = 436800;
+      document.getElementById("presetStarbucks").textContent = `Starbucks Coffee ($5): ${formatTime(starbucks / wagePerSecond)}`;
+      document.getElementById("presetCar").textContent = `Average Car ($48,000): ${formatTime(car / wagePerSecond)}`;
+      document.getElementById("presetHouse").textContent = `Average House ($436,800): ${formatTime(house / wagePerSecond)}`;
+    }
+
+    function update() {
+      if (startTime !== null && !paused) {
+        const now = Date.now();
+        const elapsed = (now - startTime) / 1000;
+        const earned = elapsed * wagePerSecond;
+
+        document.getElementById("timeWorked").textContent = formatTime(elapsed);
+        document.getElementById("moneyEarned").textContent = `$${earned.toFixed(2)}`;
+
+        const goal = parseFloat(document.getElementById("goal").value);
+        if (!isNaN(goal)) {
+          const secondsToGoal = goal / wagePerSecond;
+          document.getElementById("timeToGoal").textContent = formatTime(secondsToGoal);
+        }
+
+        updatePresets();
+      }
+      setTimeout(update, 1000);
+    }
+
+    function startTracking() {
+      const wage = parseFloat(document.getElementById("wage").value);
+      if (!isNaN(wage)) {
+        wagePerSecond = wage / 3600;
+        startTime = Date.now();
+        paused = false;
+        updatePresets();
+      }
+    }
+
+    function togglePause() {
+      if (paused) {
+        startTime += Date.now() - pausedTime;
+        paused = false;
+      } else {
+        pausedTime = Date.now();
+        paused = true;
+      }
+    }
+
+    function restartTimer() {
+      if (wagePerSecond !== null) {
+        startTime = Date.now();
+        paused = false;
+      }
+    }
+
+    function newSession() {
+      startTime = null;
+      wagePerSecond = null;
+      paused = false;
+      document.getElementById("wage").value = "";
+      document.getElementById("goal").value = "";
+      document.getElementById("timeWorked").textContent = "";
+      document.getElementById("moneyEarned").textContent = "";
+      document.getElementById("timeToGoal").textContent = "";
+      document.getElementById("presetStarbucks").textContent = "";
+      document.getElementById("presetCar").textContent = "";
+      document.getElementById("presetHouse").textContent = "";
+      document.getElementById("customEarnings").textContent = "";
+      document.getElementById("customHours").value = "";
+      document.getElementById("customMinutes").value = "";
+      document.getElementById("customSeconds").value = "";
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      isDarkMode = !isDarkMode;
+      if (isDarkMode) {
+        body.style.backgroundColor = "#1e1e1e";
+        body.style.color = "#ffffff";
+        document.getElementById("darkModeToggle").textContent = "Toggle Light Mode";
+      } else {
+        body.style.backgroundColor = "#ffffff";
+        body.style.color = "#000000";
+        document.getElementById("darkModeToggle").textContent = "Toggle Dark Mode";
+      }
+    }
+
+    function toggleTimeMode() {
+      useCalendarTime = !useCalendarTime;
+      document.getElementById("timeModeToggle").textContent = useCalendarTime ? "Use Work Hours" : "Use Calendar Time";
+    }
+
+    function calculateCustomEarnings() {
+      const hrs = parseFloat(document.getElementById("customHours").value) || 0;
+      const mins = parseFloat(document.getElementById("customMinutes").value) || 0;
+      const secs = parseFloat(document.getElementById("customSeconds").value) || 0;
+      const totalSeconds = hrs * 3600 + mins * 60 + secs;
+      if (wagePerSecond !== null) {
+        const earned = totalSeconds * wagePerSecond;
+        document.getElementById("customEarnings").textContent = `You would earn: $${earned.toFixed(2)}`;
+      } else {
+        document.getElementById("customEarnings").textContent = "Enter your hourly wage and start session first.";
+      }
+    }
+
+    update();
+  </script>
+</body>
+</html>
