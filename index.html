@@ -78,6 +78,14 @@
       margin-top: 0;
       color: #00ccff;
     }
+    footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: var(--text-secondary, #888);
+      padding: 20px 0;
+      width: 100%;
+      max-width: 600px;
+    }
   </style>
 </head>
 <body>
@@ -116,6 +124,8 @@
 
   <button id="darkModeToggle" onclick="toggleDarkMode()">Toggle Light Mode</button>
   <button id="timeModeToggle" onclick="toggleTimeMode()">Use Calendar Time</button>
+
+  <footer>© 2025 Ethan Michaelsen. All rights reserved.</footer>
 
   <script>
     let startTime = null;
