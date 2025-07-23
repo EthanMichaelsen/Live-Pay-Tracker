@@ -100,7 +100,7 @@
 </head>
 <body>
   <h1>Live Pay Tracker</h1>
-  <input id="wage" type="number" placeholder="Hourly Wage ($)" />
+  <input id="wage" type="number" placeholder="Enter Hourly Wage ($)" />
   <button onclick="startTracking()">Start Tracking</button>
   <button onclick="togglePause()">Pause / Resume</button>
   <button onclick="restartTimer()">Restart Timer</button>
@@ -127,7 +127,7 @@
     <h3>Earnings Calculator (from Time Worked):</h3>
     <input id="customHours" type="number" placeholder="Hours Worked" />
     <input id="customMinutes" type="number" placeholder="Minutes Worked" />
-    <input id="customSeconds" type="number" placeholder="Seconds Worked" />
+    <input id="customSeconds" type="number" placeholder="Seconds Worked (Optional)" />
     <button onclick="calculateCustomEarnings()">Calculate Earnings</button>
     <div id="customEarnings"></div>
   </div>
@@ -183,6 +183,7 @@
 
         document.getElementById("timeWorked").textContent = formatTime(elapsed);
         document.getElementById("moneyEarned").textContent = `$${earned.toFixed(2)}`;
+        document.title = `$${earned.toFixed(2)} earned - LivePayTracker.com`;
 
         const goal = parseFloat(document.getElementById("goal").value);
         if (!isNaN(goal)) {
@@ -238,6 +239,7 @@
       document.getElementById("customHours").value = "";
       document.getElementById("customMinutes").value = "";
       document.getElementById("customSeconds").value = "";
+      document.title = "Live Pay Tracker";
     }
 
     function toggleDarkMode() {
