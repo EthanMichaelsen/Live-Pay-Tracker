@@ -5,148 +5,782 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Track your pay in real time. Enter your wage and watch earnings grow live with Live Pay Tracker.">
-  <meta name="keywords" content="Live Pay Tracker, pay calculator, real-time wage tracker, earnings clock, time tracker, hourly wage calculator">
-  <meta name="author" content="Ethan Michaelsen">
+  <meta name="description" content="Track your pay in real time. Enter your wage and watch earnings grow live with Live Pay Tracker." />
+  <meta name="keywords" content="Live Pay Tracker, pay calculator, real-time wage tracker, earnings clock, time tracker, hourly wage calculator" />
+  <meta name="author" content="Ethan Michaelsen" />
 
   <title>Live Pay Tracker</title>
-
-  <!-- Favicon Here -->
   <link rel="icon" href="/favicon.png" type="image/png" />
 
   <style>
+    :root {
+      --bg: #0f1115;
+      --card: rgba(255, 255, 255, 0.06);
+      --card2: rgba(255, 255, 255, 0.08);
+      --text: #e9eef6;
+      --muted: rgba(233, 238, 246, 0.72);
+      --border: rgba(255, 255, 255, 0.14);
+      --accent: #00ff99;
+      --accent2: #00ccff;
+      --valueAccent: var(--accent);
+      --danger: #ff5c7a;
+      --warn: #ffce5c;
+      --shadow: 0 12px 32px rgba(0,0,0,0.35);
+      --radius: 16px;
+      --radius2: 12px;
+      --gap: 14px;
+    }
+
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --card: rgba(0, 0, 0, 0.03);
+      --card2: rgba(0, 0, 0, 0.05);
+      --text: #0f1218;
+      --muted: rgba(15, 18, 24, 0.62);
+      --border: rgba(0, 0, 0, 0.14);
+      /* Keep the SAME accent colors as dark mode */
+      --accent: #00ff99;
+      --accent2: #00ccff;
+      /* Darker for readability on white */
+      --valueAccent: #00a865;
+      --danger: #d11f4a;
+      --warn: #b87b00;
+      --shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    .hidden { display: none !important; }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #1e1e1e;
-      color: #ffffff;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, rgba(0, 204, 255, 0.12), transparent 55%),
+                  radial-gradient(1000px 650px at 90% 10%, rgba(0, 255, 153, 0.10), transparent 50%),
+                  var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 22px;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .app {
+      width: 100%;
+      max-width: 980px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      margin: 0;
+      gap: 18px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
-    input, button {
-      font-size: 16px;
-      padding: 10px;
-      margin: 5px;
-      width: 250px;
-    }
-    .output {
-      margin-top: 30px;
-      width: 100%;
-      max-width: 600px;
-      font-size: 20px;
-      line-height: 1.8;
-      text-align: left;
-    }
-    .output span.label {
-      font-weight: bold;
-      font-size: 20px;
-      display: inline-block;
-      min-width: 200px;
-    }
-    .output span.value {
-      font-size: 26px;
-      color: #00ff99;
-    }
-    #darkModeToggle, #timeModeToggle {
-      position: fixed;
-      bottom: 20px;
-      padding: 10px 15px;
-      background-color: #444;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #darkModeToggle {
-      right: 20px;
-    }
-    #timeModeToggle {
-      right: 160px;
-    }
-    .calculator-section {
-      margin-top: 40px;
-      width: 100%;
-      max-width: 600px;
+
+    header {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .section {
-      margin-top: 40px;
-      padding: 20px;
-      border: 1px solid #444;
-      border-radius: 10px;
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.05s ease, background 0.2s ease, border 0.2s ease, opacity 0.2s ease;
+      user-select: none;
+    }
+
+    button:hover { background: var(--card2); }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    button.primary {
+      border: 1px solid rgba(0, 0, 0, 0.0);
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #0b0f12;
+      font-weight: 700;
+    }
+
+    [data-theme="light"] button.primary { color: white; }
+
+    button.danger {
+      border-color: rgba(255, 92, 122, 0.35);
+      color: var(--danger);
+    }
+
+    button.small {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 11px;
+    }
+
+    button.small.iconBtn {
+      width: 42px;
+      padding: 8px 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .controls { justify-content: flex-start; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 650;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    input, select {
       width: 100%;
-      max-width: 600px;
+      font-size: 14px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.10);
+      color: var(--text);
+      outline: none;
     }
-    .section h3 {
-      margin-top: 0;
-      color: #00ccff;
+
+    [data-theme="light"] input,
+    [data-theme="light"] select {
+      background: rgba(0,0,0,0.03);
     }
+
+    input:focus, select:focus {
+      border-color: rgba(0, 204, 255, 0.55);
+      box-shadow: 0 0 0 3px rgba(0, 204, 255, 0.16);
+    }
+
+    /* Fix native dropdown readability */
+    body[data-theme="dark"] select { color-scheme: dark; }
+    body[data-theme="light"] select { color-scheme: light; }
+    body[data-theme="dark"] option { background: #0f1115; color: #e9eef6; }
+    body[data-theme="light"] option { background: #ffffff; color: #0f1218; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.08);
+    }
+
+    [data-theme="light"] .stat { background: rgba(0,0,0,0.03); }
+
+    .stat .k {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.25px;
+    }
+
+    .stat .v {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--valueAccent);
+      text-align: right;
+    }
+
+    .stat .v.small {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.08);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    [data-theme="light"] .pill { background: rgba(0,0,0,0.03); }
+
+    .pill strong { color: var(--text); }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    .progressWrap {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: rgba(0,0,0,0.10);
+    }
+
+    [data-theme="light"] .bar { background: rgba(0,0,0,0.03); }
+
+    .bar > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    .barMeta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .table th,
+    .table td {
+      padding: 10px 10px;
+      text-align: left;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.10);
+    }
+
+    [data-theme="light"] .table th { background: rgba(0,0,0,0.03); }
+
+    .table tr:last-child td { border-bottom: none; }
+
+    .table.compact th,
+    .table.compact td {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .table.compact th {
+      font-size: 11px;
+    }
+
+    .right { text-align: right; }
+
     footer {
       text-align: center;
-      font-size: 0.9em;
-      color: var(--text-secondary, #888);
-      padding: 20px 0;
-      width: 100%;
-      max-width: 600px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 14px 0 4px;
     }
+
+    /* ===== Goal celebration (subtle) ===== */
+    #confettiLayer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10000;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -14px;
+      left: 0;
+      width: 10px;
+      height: 14px;
+      border-radius: 4px;
+      opacity: 0.95;
+      will-change: transform, opacity;
+      animation: confetti-fall var(--dur, 900ms) cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+      100% { transform: translate3d(var(--dx, 0px), 92vh, 0) rotate(var(--rot, 540deg)); opacity: 0; }
+    }
+
+    .bar > div.pulse {
+      animation: goal-pulse 900ms ease-out 1;
+    }
+
+    @keyframes goal-pulse {
+      0% { filter: brightness(1); }
+      45% { filter: brightness(1.15); box-shadow: 0 0 0 4px rgba(0, 204, 255, 0.16), 0 0 18px rgba(0, 255, 153, 0.20); }
+      100% { filter: brightness(1); box-shadow: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #confettiLayer { display: none; }
+      .bar > div.pulse { animation: none; }
+    }
+
+    .toast { 
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 13, 18, 0.92);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+      max-width: min(520px, calc(100% - 24px));
+      text-align: center;
+    }
+
+    [data-theme="light"] .toast {
+      background: rgba(255,255,255,0.92);
+      color: #101318;
+      border: 1px solid rgba(0,0,0,0.16);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    }
+
+    .toast.show { opacity: 1; }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.10);
+      color: var(--text);
+      display: inline-block;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="light"] .kbd { background: rgba(0,0,0,0.03); }
   </style>
 </head>
-<body>
-  <h1>Live Pay Tracker</h1>
-  <input id="wage" type="number" placeholder="Enter Hourly Wage ($)" />
-  <button onclick="startTracking()">Start Tracking</button>
-  <button onclick="togglePause()">Pause / Resume</button>
-  <button onclick="restartTimer()">Restart Timer</button>
-  <button onclick="newSession()">New Session</button>
+<body data-theme="dark">
+  <div class="app" id="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>Live Pay Tracker</h1>
+            <p class="subtitle">A faster, clearer pay dashboard with sessions, tax estimates, and exporting.</p>
+          </div>
+        </div>
 
-  <div class="output">
-    <div><span class="label">Time Worked:</span> <span class="value" id="timeWorked"></span></div>
-    <div><span class="label">Money Earned:</span> <span class="value" id="moneyEarned"></span></div>
+        <div class="controls">
+          <button class="small" id="themeBtn" title="Toggle theme (T)">Theme</button>
+          <button class="small" id="timeModeBtn" title="Toggle time formatting">Time Mode</button>
+          <button class="small" id="precisionBtn" title="Toggle precision">Precision</button>
+          <button class="small iconBtn" id="soundBtn" title="Goal sound: muted" aria-label="Toggle goal sound" aria-pressed="false">🔇</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Setup</h2>
+
+        <div class="row">
+          <div>
+            <label for="payType">Pay basis</label>
+            <select id="payType">
+              <option value="hourly" selected>Hourly</option>
+              <option value="salary">Salary (annual)</option>
+            </select>
+          </div>
+          <div>
+            <label for="currency">Currency (display)</label>
+            <select id="currency">
+              <option value="USD" selected>USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="CAD">CAD ($)</option>
+              <option value="AUD">AUD ($)</option>
+              <option value="JPY">JPY (¥)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 12px;">
+          <div id="hourlyWrap">
+            <label for="wage">Hourly wage</label>
+            <input id="wage" type="number" inputmode="decimal" placeholder="e.g., 28.85" step="0.01" min="0" />
+          </div>
+          <div id="salaryWrap" class="hidden">
+            <label for="salaryAnnual">Annual salary</label>
+            <input id="salaryAnnual" type="number" inputmode="decimal" placeholder="e.g., 60000" step="1" min="0" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 12px;">
+          <div>
+            <label for="taxRate">Estimated tax rate (optional)</label>
+            <input id="taxRate" type="number" inputmode="decimal" placeholder="e.g., 22" step="0.1" min="0" max="99" />
+          </div>
+          <div id="pphWrap" class="hidden">
+            <label for="pph">Hours/year (salary conversion)</label>
+            <input id="pph" type="number" inputmode="numeric" placeholder="2080" step="1" min="1" value="2080" />
+          </div>
+        </div>
+
+        <div class="inline" style="margin-top: 14px;">
+          <button class="primary" id="startBtn" title="Start (Space)">Start</button>
+          <button id="pauseBtn" title="Pause/Resume (Space)">Pause</button>
+          <button id="lapBtn" title="Add lap/milestone">Lap</button>
+          <button id="restartBtn" title="Restart session">Restart</button>
+          <button class="danger" id="newBtn" title="Clear all">New</button>
+
+          <span class="pill" id="statusPill"><strong>Status:</strong> Ready</span>
+          <span class="pill" id="sessionPill"><strong>Session:</strong> None</span>
+          <span class="pill hidden" id="takeHomePill"><strong>Take-home:</strong> --</span>
+        </div>
+
+        <div class="hint">
+          Shortcuts: <span class="kbd">Space</span> start/pause, <span class="kbd">N</span> new, <span class="kbd">T</span> theme, <span class="kbd">L</span> lap.
+          All data stays on your device (local storage). No sign-in.
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Live</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Time worked</div>
+            <div class="v" id="timeWorked">0h 0m 0s</div>
+          </div>
+          <div class="stat">
+            <div class="k">Gross earned</div>
+            <div class="v" id="moneyEarned">$0.00</div>
+          </div>
+          <div class="stat" id="netRow" style="display:none;">
+            <div class="k">Net earned (est.)</div>
+            <div class="v" id="moneyNet">$0.00</div>
+          </div>
+          <div class="stat">
+            <div class="k" id="rateKey">Rate</div>
+            <div class="v small" id="rateText">$0.00/hr</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="hint" style="margin-top:0; margin-bottom: 8px;">Laps</div>
+        <table class="table compact" id="lapTable" aria-label="Laps">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>When</th>
+              <th>Elapsed</th>
+              <th class="right">Gross</th>
+              <th class="right">Net</th>
+            </tr>
+          </thead>
+          <tbody id="lapTbody">
+            <tr><td colspan="5" style="color: var(--muted);">No laps yet.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div>
+            <label for="goal">Goal amount</label>
+            <input id="goal" type="number" inputmode="decimal" placeholder="e.g., 1000" step="0.01" min="0" />
+          </div>
+          <div>
+            <label for="goalNet">Goal type</label>
+            <select id="goalNet">
+              <option value="gross" selected>Gross</option>
+              <option value="net">Net (uses tax rate)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="progressWrap">
+          <div class="bar"><div id="goalBar"></div></div>
+          <div class="barMeta">
+            <span id="goalMetaLeft">Enter a goal to see progress</span>
+            <span id="goalMetaRight"></span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div>
+            <label>Time to reach goal</label>
+            <div class="stat" style="margin:0;">
+              <div class="k">Total</div>
+              <div class="v" id="timeToGoal">--</div>
+            </div>
+          </div>
+          <div>
+            <label>Remaining</label>
+            <div class="stat" style="margin:0;">
+              <div class="k">Left</div>
+              <div class="v" id="timeRemaining">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint" id="goalHint">Tip: If you enter a tax rate, you can switch goals to Net.</div>
+      </section>
+
+      <aside class="card">
+        <h2>Presets</h2>
+
+        <div class="row">
+          <div>
+            <label>Time mode</label>
+            <div class="pill" id="presetTimeModePill"><strong>Time:</strong> Work</div>
+          </div>
+          <div>
+            <label for="presetUnit">Show</label>
+            <select id="presetUnit">
+              <option value="gross" selected>Gross</option>
+              <option value="net">Net (uses tax)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stats" id="presets">
+          <!-- injected -->
+        </div>
+
+        <div class="divider"></div>
+
+        <h2>Calculator</h2>
+        <div class="row">
+          <div>
+            <label for="customHours">Hours</label>
+            <input id="customHours" type="number" inputmode="numeric" placeholder="0" min="0" step="1" />
+          </div>
+          <div>
+            <label for="customMinutes">Minutes</label>
+            <input id="customMinutes" type="number" inputmode="numeric" placeholder="0" min="0" step="1" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+          <div>
+            <label for="customSeconds">Seconds</label>
+            <input id="customSeconds" type="number" inputmode="numeric" placeholder="0" min="0" step="1" />
+          </div>
+          <div style="display:flex; align-items:flex-end;">
+            <button id="calcBtn" style="width:100%;">Calculate</button>
+          </div>
+        </div>
+        <div class="hint" id="customEarnings">Enter wage/salary and calculate.</div>
+      </aside>
+    </div>
+
+    <section class="card">
+      <div class="inline" style="justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+        <div>
+          <h2 style="margin:0;">Saved sessions</h2>
+          <div class="hint" style="margin:6px 0 0 0;">Save a running (or paused) session. Export creates a CSV for Excel/Sheets.</div>
+        </div>
+        <div class="inline" style="justify-content:flex-end;">
+          <button id="saveSessionBtn" class="small">Save current</button>
+          <button id="exportCsvBtn" class="small">Export CSV</button>
+          <button id="clearSessionsBtn" class="small danger">Clear saved</button>
+        </div>
+      </div>
+
+      <table class="table" id="sessionTable" aria-label="Saved sessions">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Duration</th>
+            <th class="right">Gross</th>
+            <th class="right">Net</th>
+            <th class="right">Rate</th>
+          </tr>
+        </thead>
+        <tbody id="sessionTbody">
+          <tr><td colspan="5" style="color: var(--muted);">No saved sessions yet.</td></tr>
+        </tbody>
+      </table>
+      <div class="hint">Pro tip: sessions are stored in your browser (localStorage). Incognito/private modes may clear them.</div>
+    </section>
+
+    <footer>© 2026 Ethan Michaelsen. Local-first web app.</footer>
   </div>
 
-  <div class="section">
-    <input id="goal" type="number" placeholder="Enter Goal Amount ($)" />
-    <div><span class="label">Time to Reach Goal:</span> <span class="value" id="timeToGoal"></span></div>
-  </div>
+  <div id="confettiLayer" aria-hidden="true"></div>
 
-  <div class="section">
-    <h3>Common Goal References (in work time):</h3>
-    <div id="presetStarbucks"></div>
-    <div id="presetCar"></div>
-    <div id="presetHouse"></div>
-  </div>
-
-  <div class="section">
-    <h3>Earnings Calculator (from Time Worked):</h3>
-    <input id="customHours" type="number" placeholder="Hours Worked" />
-    <input id="customMinutes" type="number" placeholder="Minutes Worked" />
-    <input id="customSeconds" type="number" placeholder="Seconds Worked (Optional)" />
-    <button onclick="calculateCustomEarnings()">Calculate Earnings</button>
-    <div id="customEarnings"></div>
-  </div>
-
-  <button id="darkModeToggle" onclick="toggleDarkMode()">Toggle Light Mode</button>
-  <button id="timeModeToggle" onclick="toggleTimeMode()">Use Calendar Time</button>
-
-  <footer>© 2025 Ethan Michaelsen. All rights reserved.</footer>
+  <div class="toast" id="toast"></div>
 
   <script>
-    let startTime = null;
-    let pausedTime = null;
-    let wagePerSecond = null;
-    let paused = false;
-    let isDarkMode = true;
-    let useCalendarTime = false;
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      startTimeMs: null,
+      paused: false,
+      pausedAtMs: null,
+      elapsedMsBeforePause: 0,
+      wagePerSecond: null,
+      currency: 'USD',
+      precisionMode: 'cents',
+      timeMode: 'work',
+      sessionId: null,
+      goalWasComplete: false,
+      soundMuted: true,
+      laps: [],
+      lastSaveTimeMs: 0,
+    };
+
+    const STORAGE_KEY = 'lpt_v2_state';
+    const SESSIONS_KEY = 'lpt_v2_sessions';
+    const SOUND_KEY = 'lpt_goal_sound_muted_v1';
+
+    function formatCurrency(amount) {
+      const currency = state.currency || 'USD';
+      const minimumFractionDigits = currency === 'JPY' ? 0 : (state.precisionMode === 'millis' ? 3 : 2);
+      const maximumFractionDigits = minimumFractionDigits;
+
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency,
+          minimumFractionDigits,
+          maximumFractionDigits,
+        }).format(amount);
+      } catch {
+        const sign = currency === 'USD' ? '$' : '';
+        return `${sign}${amount.toFixed(minimumFractionDigits)}`;
+      }
+    }
+
+    function clamp(n, a, b) { return Math.min(b, Math.max(a, n)); }
+    function safeNum(x) { const n = Number(x); return Number.isFinite(n) ? n : null; }
+    function pad2(n) { return String(n).padStart(2, '0'); }
 
     function formatTime(seconds) {
-      if (useCalendarTime) {
+      seconds = Math.max(0, Math.floor(seconds));
+      if (state.timeMode === 'calendar') {
         const years = Math.floor(seconds / (365 * 86400));
         seconds %= 365 * 86400;
         const days = Math.floor(seconds / 86400);
@@ -154,127 +788,1057 @@
         const hrs = Math.floor(seconds / 3600);
         seconds %= 3600;
         const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${years > 0 ? years + ' years, ' : ''}${days > 0 ? days + ' days, ' : ''}${hrs} hours, ${mins} minutes, ${secs} seconds`;
-      } else {
-        const hrs = Math.floor(seconds / 3600);
-        seconds %= 3600;
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${hrs}h ${mins}m ${secs}s`;
+        const secs = seconds % 60;
+        const parts = [];
+        if (years > 0) parts.push(`${years}y`);
+        if (days > 0) parts.push(`${days}d`);
+        parts.push(`${hrs}h`, `${mins}m`, `${secs}s`);
+        return parts.join(' ');
+      }
+      const hrs = Math.floor(seconds / 3600);
+      seconds %= 3600;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${hrs}h ${mins}m ${secs}s`;
+    }
+
+    function formatISODate(ts) {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = pad2(d.getMonth() + 1);
+      const da = pad2(d.getDate());
+      const hh = pad2(d.getHours());
+      const mm = pad2(d.getMinutes());
+      return `${y}-${m}-${da} ${hh}:${mm}`;
+    }
+
+    function toast(msg) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    // ===== Tiny DOM helpers (avoid unnecessary repaints) =====
+    function setTextIfChanged(el, text) {
+      if (!el) return;
+      if (el.textContent !== text) el.textContent = text;
+    }
+
+    function setHTMLIfChanged(el, html) {
+      if (!el) return;
+      if (el.innerHTML !== html) el.innerHTML = html;
+    }
+
+    function setDisplayIfChanged(el, display) {
+      if (!el) return;
+      if (el.style.display !== display) el.style.display = display;
+    }
+
+    function toggleHiddenIfChanged(el, shouldHide) {
+      if (!el) return;
+      const isHidden = el.classList.contains('hidden');
+      if (isHidden !== shouldHide) el.classList.toggle('hidden', shouldHide);
+    }
+
+    let audioCtx = null;
+
+    function loadSoundPref() {
+      try {
+        const v = localStorage.getItem(SOUND_KEY);
+        // Default muted for safety (office-friendly)
+        state.soundMuted = (v === null) ? true : (v === '1');
+      } catch {
+        state.soundMuted = true;
       }
     }
+
+    function saveSoundPref() {
+      try {
+        localStorage.setItem(SOUND_KEY, state.soundMuted ? '1' : '0');
+      } catch {
+        // ignore
+      }
+    }
+
+    function updateSoundBtn() {
+      const btn = $('soundBtn');
+      if (!btn) return;
+      const on = !state.soundMuted;
+      btn.textContent = on ? '🔈' : '🔇';
+      btn.title = on ? 'Goal sound: on (click to mute)' : 'Goal sound: muted (click to unmute)';
+      btn.setAttribute('aria-pressed', String(on));
+    }
+
+    function primeAudio() {
+      if (state.soundMuted) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch {
+        // ignore
+      }
+    }
+
+    function playGoalChime() {
+      if (state.soundMuted) return;
+      primeAudio();
+      if (!audioCtx) return;
+
+      try {
+        const t0 = audioCtx.currentTime;
+        const g = audioCtx.createGain();
+        // Very quiet, office-safe
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.028, t0 + 0.025);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.34);
+        g.connect(audioCtx.destination);
+
+        const o1 = audioCtx.createOscillator();
+        o1.type = 'sine';
+        o1.frequency.setValueAtTime(740, t0);
+        o1.frequency.exponentialRampToValueAtTime(880, t0 + 0.07);
+        o1.connect(g);
+        o1.start(t0);
+        o1.stop(t0 + 0.14);
+
+        const o2 = audioCtx.createOscillator();
+        o2.type = 'sine';
+        o2.frequency.setValueAtTime(660, t0 + 0.13);
+        o2.connect(g);
+        o2.start(t0 + 0.13);
+        o2.stop(t0 + 0.34);
+      } catch {
+        // ignore
+      }
+    }
+
+    function toggleSound() {
+      state.soundMuted = !state.soundMuted;
+      saveSoundPref();
+      updateSoundBtn();
+      // If user turns it on, unlock audio immediately so the next goal can chime.
+      if (!state.soundMuted) primeAudio();
+    }
+
+    function pulseGoalBar() {
+      const el = $('goalBar');
+      if (!el) return;
+      el.classList.remove('pulse');
+      // force reflow so animation can replay
+      void el.offsetWidth;
+      el.classList.add('pulse');
+      setTimeout(() => el.classList.remove('pulse'), 950);
+    }
+
+    function burstConfetti() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const layer = $('confettiLayer');
+      if (!layer) return;
+
+      const colors = ['var(--accent)', 'var(--accent2)', 'var(--warn)', 'var(--danger)', 'var(--valueAccent)'];
+
+      // Stream confetti for ~2 seconds (noticeable, not intrusive)
+      const totalMs = 2000;
+      const intervalMs = 120;
+      const batches = Math.ceil(totalMs / intervalMs);
+      const perBatch = 7;
+
+      function spawnBatch(n) {
+        for (let i = 0; i < n; i++) {
+          const p = document.createElement('span');
+          p.className = 'confetti';
+
+          const left = Math.random() * 100;
+          const dx = (Math.random() * 2 - 1) * 160;
+          const rot = (Math.random() * 2 - 1) * 720;
+          const dur = 2000 + Math.random() * 700;
+          const w = 6 + Math.random() * 7;
+          const h = 8 + Math.random() * 11;
+
+          p.style.left = `${left}vw`;
+          p.style.width = `${w}px`;
+          p.style.height = `${h}px`;
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          p.style.setProperty('--dx', `${dx}px`);
+          p.style.setProperty('--rot', `${rot}deg`);
+          p.style.setProperty('--dur', `${dur}ms`);
+
+          layer.appendChild(p);
+          setTimeout(() => p.remove(), dur + 120);
+        }
+      }
+
+      // Prevent stacking multiple streams
+      if (burstConfetti._int) {
+        clearInterval(burstConfetti._int);
+        burstConfetti._int = null;
+      }
+
+      spawnBatch(10);
+      let n = 0;
+      burstConfetti._int = setInterval(() => {
+        spawnBatch(perBatch);
+        n += 1;
+        if (n >= batches) {
+          clearInterval(burstConfetti._int);
+          burstConfetti._int = null;
+        }
+      }, intervalMs);
+
+      // Safety stop
+      setTimeout(() => {
+        if (burstConfetti._int) {
+          clearInterval(burstConfetti._int);
+          burstConfetti._int = null;
+        }
+      }, totalMs + 50);
+    }
+
+    function getTaxRateFraction() {
+      const tr = safeNum($('taxRate').value);
+      if (tr === null) return null;
+      return clamp(tr / 100, 0, 0.99);
+    }
+
+    function computeWagePerSecond() {
+      const payType = $('payType').value;
+      state.currency = $('currency').value;
+
+      if (payType === 'hourly') {
+        const wage = safeNum($('wage').value);
+        if (wage === null || wage < 0) return null;
+        return wage / 3600;
+      }
+
+      const salaryAnnual = safeNum($('salaryAnnual').value);
+      const hoursYear = safeNum($('pph').value) ?? 2080;
+      if (salaryAnnual === null || salaryAnnual < 0 || !hoursYear || hoursYear <= 0) return null;
+      const hourly = salaryAnnual / hoursYear;
+      return hourly / 3600;
+    }
+
+    function getElapsedSeconds() {
+      if (state.startTimeMs === null) return 0;
+      if (state.paused) return Math.floor(state.elapsedMsBeforePause / 1000);
+      const now = Date.now();
+      const elapsedMs = (now - state.startTimeMs) + state.elapsedMsBeforePause;
+      return Math.floor(elapsedMs / 1000);
+    }
+
+    function getEarnedGross(elapsedSeconds) {
+      if (!state.wagePerSecond) return 0;
+      return elapsedSeconds * state.wagePerSecond;
+    }
+
+    function getEarnedNet(gross) {
+      const tr = getTaxRateFraction();
+      if (tr === null) return null;
+      return gross * (1 - tr);
+    }
+
+    const PRESETS = [
+      { name: 'Coffee', amount: 5 },
+      { name: 'Meal', amount: 15 },
+      { name: 'Gas tank', amount: 60 },
+      { name: 'New phone', amount: 1000 },
+      { name: 'Rent (1 mo)', amount: 1600 },
+      { name: 'Car', amount: 48000 },
+      { name: 'House', amount: 436800 },
+    ];
 
     function updatePresets() {
-      if (!wagePerSecond) return;
-      const starbucks = 5;
-      const car = 48000;
-      const house = 436800;
-      document.getElementById("presetStarbucks").textContent = `Starbucks Coffee ($5): ${formatTime(starbucks / wagePerSecond)}`;
-      document.getElementById("presetCar").textContent = `Average Car ($48,000): ${formatTime(car / wagePerSecond)}`;
-      document.getElementById("presetHouse").textContent = `Average House ($436,800): ${formatTime(house / wagePerSecond)}`;
+      const wrap = $('presets');
+      wrap.innerHTML = '';
+
+      const perSecond = state.wagePerSecond;
+      if (!perSecond) {
+        wrap.innerHTML = `<div class="hint">Enter a wage/salary and press Start to enable presets.</div>`;
+        return;
+      }
+
+      const presetUnit = $('presetUnit').value;
+      const taxF = getTaxRateFraction();
+      const effectivePerSecond = (() => {
+        if (presetUnit === 'net') {
+          if (taxF === null) return null;
+          return perSecond * (1 - taxF);
+        }
+        return perSecond;
+      })();
+
+      if (presetUnit === 'net' && effectivePerSecond === null) {
+        wrap.innerHTML = `<div class="hint">Set a tax rate to view Net presets.</div>`;
+        return;
+      }
+
+      for (const p of PRESETS) {
+        const seconds = p.amount / effectivePerSecond;
+        const div = document.createElement('div');
+        div.className = 'stat';
+        div.innerHTML = `
+          <div>
+            <div class="k">${p.name}</div>
+            <div class="v small">${formatCurrency(p.amount)}</div>
+          </div>
+          <div class="v" style="font-size:18px; color: var(--valueAccent);">${formatTime(seconds)}</div>
+        `;
+        wrap.appendChild(div);
+      }
     }
 
-    function update() {
-      if (startTime !== null && !paused) {
-        const now = Date.now();
-        const elapsed = (now - startTime) / 1000;
-        const earned = elapsed * wagePerSecond;
+    function renderLaps() {
+      const tbody = $('lapTbody');
+      if (!tbody) return;
 
-        document.getElementById("timeWorked").textContent = formatTime(elapsed);
-        document.getElementById("moneyEarned").textContent = `$${earned.toFixed(2)}`;
-        document.title = `$${earned.toFixed(2)} earned - LivePayTracker.com`;
+      const laps = Array.isArray(state.laps) ? state.laps : [];
+      if (!laps.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color: var(--muted);">No laps yet.</td></tr>`;
+        return;
+      }
 
-        const goal = parseFloat(document.getElementById("goal").value);
-        if (!isNaN(goal)) {
-          const secondsToGoal = goal / wagePerSecond;
-          document.getElementById("timeToGoal").textContent = formatTime(secondsToGoal);
+      const maxRows = 20;
+      const start = Math.max(0, laps.length - maxRows);
+      const view = laps.slice(start);
+
+      tbody.innerHTML = '';
+      for (let i = view.length - 1; i >= 0; i--) {
+        const lap = view[i] || {};
+        const idx = start + i + 1;
+
+        const when = formatISODate(Number(lap.ts || Date.now()));
+        const elapsed = formatTime(Number(lap.elapsedSeconds || 0));
+        const gross = formatCurrency(Number(lap.gross || 0));
+        const net = (lap.net == null) ? '—' : formatCurrency(Number(lap.net));
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx}</td>
+          <td>${when}</td>
+          <td>${elapsed}</td>
+          <td class="right">${gross}</td>
+          <td class="right">${net}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function updateGoalUI(elapsedSeconds, gross, net) {
+      const goal = safeNum($('goal').value);
+      const goalType = $('goalNet').value;
+
+      const bar = $('goalBar');
+      const left = $('goalMetaLeft');
+      const right = $('goalMetaRight');
+      const eta = $('timeToGoal');
+      const rem = $('timeRemaining');
+
+      if (goal === null || goal <= 0 || !state.wagePerSecond) {
+        state.goalWasComplete = false;
+        bar.style.width = '0%';
+        left.textContent = 'Enter a goal to see progress';
+        right.textContent = '';
+        eta.textContent = '--';
+        rem.textContent = '--';
+        return;
+      }
+
+      let earnedForGoal = gross;
+      let perSecondForGoal = state.wagePerSecond;
+
+      if (goalType === 'net') {
+        const tr = getTaxRateFraction();
+        if (tr === null) {
+          state.goalWasComplete = false;
+          left.textContent = 'Set a tax rate to use Net goals';
+          right.textContent = '';
+          bar.style.width = '0%';
+          eta.textContent = '--';
+          rem.textContent = '--';
+          return;
+        }
+        earnedForGoal = net ?? gross * (1 - tr);
+        perSecondForGoal = state.wagePerSecond * (1 - tr);
+      }
+
+      const rawPct0 = (goal > 0) ? (earnedForGoal / goal) * 100 : 0;
+      const rawPct = Number.isFinite(rawPct0) ? rawPct0 : 0;
+      const barPct = clamp(rawPct, 0, 100);
+      bar.style.width = `${barPct.toFixed(1)}%`;
+
+      const secondsToGoal = goal / perSecondForGoal;
+      const secondsRemaining = Math.max(0, secondsToGoal - elapsedSeconds);
+
+      eta.textContent = formatTime(secondsToGoal);
+      rem.textContent = formatTime(secondsRemaining);
+
+      left.textContent = `${rawPct.toFixed(1)}% complete`;
+      right.textContent = `${formatCurrency(earnedForGoal)} / ${formatCurrency(goal)}`;
+
+      const isComplete = rawPct >= 100;
+      if (isComplete && !state.goalWasComplete) {
+        state.goalWasComplete = true;
+        burstConfetti();
+        pulseGoalBar();
+        toast('Goal reached!');
+        playGoalChime();
+      } else if (!isComplete) {
+        state.goalWasComplete = false;
+      }
+
+      if (state.startTimeMs !== null) document.title = `${formatCurrency(gross)} earned • Live Pay Tracker`;
+      else document.title = 'Live Pay Tracker';
+    }
+
+    function loadSessions() {
+      try {
+        const raw = localStorage.getItem(SESSIONS_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveSessions(sessions) {
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+    }
+
+    function updateSessionButtons(skipStorageCheck = false) {
+      const hasActive = state.sessionId !== null
+        && state.wagePerSecond !== null
+        && (getElapsedSeconds() > 0 || state.paused || state.startTimeMs !== null);
+
+      const saveBtn = $('saveSessionBtn');
+      if (saveBtn) saveBtn.disabled = !hasActive;
+
+      if (skipStorageCheck) return;
+
+      const sessions = loadSessions();
+      const noSaved = sessions.length === 0;
+
+      const exportBtn = $('exportCsvBtn');
+      const clearBtn = $('clearSessionsBtn');
+      if (exportBtn) exportBtn.disabled = noSaved;
+      if (clearBtn) clearBtn.disabled = noSaved;
+    }
+
+    function renderSessionsTable() {
+      const tbody = $('sessionTbody');
+      const sessions = loadSessions();
+
+      if (!sessions.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color: var(--muted);">No saved sessions yet.</td></tr>`;
+        updateSessionButtons();
+        return;
+      }
+
+      const sorted = [...sessions].sort((a,b) => b.endedAt - a.endedAt);
+      tbody.innerHTML = '';
+      for (const s of sorted) {
+        const tr = document.createElement('tr');
+        const duration = formatTime(Math.floor(s.elapsedSeconds || 0));
+        const gross = formatCurrency(Number(s.gross || 0));
+        const net = s.net == null ? '—' : formatCurrency(Number(s.net));
+        const rate = formatCurrency(Number(s.rateHourly || 0)) + '/hr';
+        tr.innerHTML = `
+          <td>${formatISODate(s.endedAt)}</td>
+          <td>${duration}</td>
+          <td class="right">${gross}</td>
+          <td class="right">${net}</td>
+          <td class="right">${rate}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      updateSessionButtons();
+    }
+
+    function exportSessionsCSV() {
+      const sessions = loadSessions();
+      if (!sessions.length) {
+        toast('No sessions to export.');
+        return;
+      }
+
+      const header = ['ended_at', 'elapsed_seconds', 'duration_formatted', 'gross', 'net', 'rate_hourly', 'currency', 'tax_rate_percent'];
+      const lines = [header.join(',')];
+
+      for (const s of sessions.sort((a, b) => a.endedAt - b.endedAt)) {
+        const elapsedSeconds = Number(s.elapsedSeconds ?? 0);
+        const row = [
+          new Date(s.endedAt).toISOString(),
+          String(elapsedSeconds),
+          String(formatTime(elapsedSeconds)),
+          String(s.gross ?? ''),
+          String(s.net ?? ''),
+          String(s.rateHourly ?? ''),
+          String(s.currency ?? ''),
+          String(s.taxRatePercent ?? ''),
+        ];
+
+        lines.push(
+          row.map(v => {
+            const str = String(v);
+            return /[",\n]/.test(str) ? `"${str.replaceAll('"', '""')}"` : str;
+          }).join(',')
+        );
+      }
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `live_pay_tracker_sessions_${Date.now()}.csv`;
+      a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast('Exported CSV.');
+    }
+
+    function saveAppState() {
+      const snapshot = {
+        startTimeMs: state.startTimeMs,
+        paused: state.paused,
+        pausedAtMs: state.pausedAtMs,
+        elapsedMsBeforePause: state.elapsedMsBeforePause,
+        wagePerSecond: state.wagePerSecond,
+        currency: state.currency,
+        precisionMode: state.precisionMode,
+        timeMode: state.timeMode,
+        sessionId: state.sessionId,
+        laps: Array.isArray(state.laps) ? state.laps : [],
+        lastSaveTimeMs: state.lastSaveTimeMs,
+        inputs: {
+          wage: $('wage').value,
+          payType: $('payType').value,
+          salaryAnnual: $('salaryAnnual').value,
+          pph: $('pph').value,
+          taxRate: $('taxRate').value,
+          currency: $('currency').value,
+          goal: $('goal').value,
+          goalNet: $('goalNet').value,
+          presetUnit: $('presetUnit').value,
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+    }
+
+    function loadAppState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const s = JSON.parse(raw);
+
+        if (s.inputs) {
+          $('wage').value = s.inputs.wage ?? '';
+          $('payType').value = s.inputs.payType ?? 'hourly';
+          $('salaryAnnual').value = s.inputs.salaryAnnual ?? '';
+          $('pph').value = s.inputs.pph ?? '2080';
+          $('taxRate').value = s.inputs.taxRate ?? '';
+          $('currency').value = s.inputs.currency ?? 'USD';
+          $('goal').value = s.inputs.goal ?? '';
+          $('goalNet').value = s.inputs.goalNet ?? 'gross';
+          $('presetUnit').value = s.inputs.presetUnit ?? 'gross';
         }
 
+        state.currency = $('currency').value;
+        state.precisionMode = s.precisionMode ?? 'cents';
+        state.timeMode = s.timeMode ?? 'work';
+
+        state.startTimeMs = typeof s.startTimeMs === 'number' ? s.startTimeMs : null;
+        state.paused = !!s.paused;
+        state.pausedAtMs = typeof s.pausedAtMs === 'number' ? s.pausedAtMs : null;
+        state.elapsedMsBeforePause = typeof s.elapsedMsBeforePause === 'number' ? s.elapsedMsBeforePause : 0;
+        state.wagePerSecond = typeof s.wagePerSecond === 'number' ? s.wagePerSecond : null;
+        state.sessionId = s.sessionId ?? null;
+
+        state.laps = Array.isArray(s.laps) ? s.laps : [];
+        state.lastSaveTimeMs = typeof s.lastSaveTimeMs === 'number' ? s.lastSaveTimeMs : 0;
+
+        applyPayTypeUI();
+        applyThemeFromStorage();
+        applyPrecisionLabel();
+        applyTimeModeLabel();
         updatePresets();
+        renderLaps();
+        renderSessionsTable();
+
+        if (state.startTimeMs !== null) {
+          setHTMLIfChanged($('statusPill'), state.paused ? '<strong>Status:</strong> Paused' : '<strong>Status:</strong> Running');
+          setHTMLIfChanged($('sessionPill'), `<strong>Session:</strong> ${state.sessionId ?? 'Active'}`);
+          setTextIfChanged($('pauseBtn'), state.paused ? 'Resume' : 'Pause');
+        }
+      } catch {
+        // ignore
       }
-      setTimeout(update, 1000);
     }
 
-    function startTracking() {
-      const wage = parseFloat(document.getElementById("wage").value);
-      if (!isNaN(wage)) {
-        wagePerSecond = wage / 3600;
-        startTime = Date.now();
-        paused = false;
-        updatePresets();
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('lpt_theme', theme);
+      toast(theme === 'light' ? 'Light theme' : 'Dark theme');
+    }
+
+    function applyThemeFromStorage() {
+      const t = localStorage.getItem('lpt_theme') || 'dark';
+      document.body.setAttribute('data-theme', t);
+    }
+
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme') || 'dark';
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+
+    function applyPayTypeUI() {
+      const payType = $('payType').value;
+      const isSalary = payType === 'salary';
+
+      $('salaryWrap').classList.toggle('hidden', !isSalary);
+      $('pphWrap').classList.toggle('hidden', !isSalary);
+      $('hourlyWrap').classList.toggle('hidden', isSalary);
+
+      $('salaryAnnual').disabled = !isSalary;
+      $('pph').disabled = !isSalary;
+      $('wage').disabled = isSalary;
+    }
+
+    function applyPrecisionLabel() {
+      $('precisionBtn').textContent = state.precisionMode === 'millis' ? 'Precision: 0.001' : 'Precision: 0.01';
+    }
+
+    function applyTimeModeLabel() {
+      const btn = $('timeModeBtn');
+      const label = state.timeMode === 'calendar' ? 'Time: Calendar' : 'Time: Work';
+      setTextIfChanged(btn, label);
+
+      const pill = $('presetTimeModePill');
+      if (pill) {
+        const html = state.timeMode === 'calendar'
+          ? '<strong>Time:</strong> Calendar'
+          : '<strong>Time:</strong> Work';
+        setHTMLIfChanged(pill, html);
       }
+    }
+
+    function startSession() {
+      const wps = computeWagePerSecond();
+      if (!wps || wps <= 0) {
+        toast('Enter a valid wage/salary first.');
+        return;
+      }
+
+      state.wagePerSecond = wps;
+
+      // If sound is enabled, unlock audio after a user click so goal chime works reliably
+      primeAudio();
+
+      if (state.startTimeMs !== null && state.paused) {
+        resumeSession();
+        return;
+      }
+
+      if (state.startTimeMs === null) {
+        state.startTimeMs = Date.now();
+        state.elapsedMsBeforePause = 0;
+      }
+
+      state.paused = false;
+      state.pausedAtMs = null;
+      state.sessionId = state.sessionId || `S${Math.floor(Math.random()*90000)+10000}`;
+
+      $('statusPill').innerHTML = '<strong>Status:</strong> Running';
+      $('sessionPill').innerHTML = `<strong>Session:</strong> ${state.sessionId}`;
+      $('pauseBtn').textContent = 'Pause';
+      updatePresets();
+      saveAppState();
+      updateSessionButtons();
+      toast('Tracking started.');
+    }
+
+    function pauseSession() {
+      if (state.startTimeMs === null) return;
+      if (state.paused) return;
+
+      const now = Date.now();
+      const elapsedMs = now - state.startTimeMs;
+      state.elapsedMsBeforePause += elapsedMs;
+      state.startTimeMs = now;
+      state.pausedAtMs = now;
+      state.paused = true;
+
+      $('statusPill').innerHTML = '<strong>Status:</strong> Paused';
+      $('pauseBtn').textContent = 'Resume';
+      saveAppState();
+      updateSessionButtons();
+      toast('Paused.');
+    }
+
+    function resumeSession() {
+      if (state.startTimeMs === null) return;
+      if (!state.paused) return;
+
+      state.paused = false;
+      state.pausedAtMs = null;
+
+      // CRITICAL FIX: reset anchor so paused time is not counted
+      state.startTimeMs = Date.now();
+
+      $('statusPill').innerHTML = '<strong>Status:</strong> Running';
+      $('pauseBtn').textContent = 'Pause';
+      saveAppState();
+      updateSessionButtons();
+      toast('Resumed.');
     }
 
     function togglePause() {
-      if (paused) {
-        startTime += Date.now() - pausedTime;
-        paused = false;
+      if (state.startTimeMs === null) {
+        startSession();
+        return;
+      }
+      if (state.paused) resumeSession();
+      else pauseSession();
+    }
+
+    function restartSession() {
+      const wps = computeWagePerSecond();
+      if (!wps || wps <= 0) {
+        toast('Set wage/salary first.');
+        return;
+      }
+
+      state.wagePerSecond = wps;
+
+      // Always restart to ZERO and PAUSED (never auto-running)
+      const now = Date.now();
+      state.startTimeMs = now;
+      state.elapsedMsBeforePause = 0;
+      state.paused = true;
+      state.pausedAtMs = now;
+      state.sessionId = `S${Math.floor(Math.random()*90000)+10000}`;
+
+      // clear laps on restart
+      state.laps = [];
+      renderLaps();
+
+      $('statusPill').innerHTML = '<strong>Status:</strong> Paused';
+      $('sessionPill').innerHTML = `<strong>Session:</strong> ${state.sessionId}`;
+      $('pauseBtn').textContent = 'Resume';
+
+      // reset goal celebration state so a fresh run can celebrate again
+      state.goalWasComplete = false;
+
+      updatePresets();
+      saveAppState();
+      updateSessionButtons();
+      toast('Restarted (paused).');
+    }
+
+    function clearAll() {
+      if (!confirm('Clear current session + inputs? (Saved sessions stay unless you clear them separately.)')) return;
+      state.startTimeMs = null;
+      state.elapsedMsBeforePause = 0;
+      state.paused = false;
+      state.pausedAtMs = null;
+      state.wagePerSecond = null;
+      state.sessionId = null;
+      state.laps = [];
+      state.lastSaveTimeMs = 0;
+      renderLaps();
+
+      $('wage').value = '';
+      $('salaryAnnual').value = '';
+      $('taxRate').value = '';
+      $('goal').value = '';
+
+      $('timeWorked').textContent = '0h 0m 0s';
+      $('moneyEarned').textContent = formatCurrency(0);
+      $('moneyNet').textContent = formatCurrency(0);
+      $('timeToGoal').textContent = '--';
+      $('timeRemaining').textContent = '--';
+      $('rateKey').textContent = 'Rate';
+      $('rateText').textContent = formatCurrency(0) + '/hr';
+
+      $('statusPill').innerHTML = '<strong>Status:</strong> Ready';
+      $('sessionPill').innerHTML = '<strong>Session:</strong> None';
+      $('pauseBtn').textContent = 'Pause';
+
+      $('goalBar').style.width = '0%';
+      $('goalMetaLeft').textContent = 'Enter a goal to see progress';
+      $('goalMetaRight').textContent = '';
+
+      $('customEarnings').textContent = 'Enter wage/salary and calculate.';
+      $('takeHomePill').classList.add('hidden');
+
+      updatePresets();
+      updateSessionButtons();
+
+      document.title = 'Live Pay Tracker';
+      localStorage.removeItem(STORAGE_KEY);
+      toast('Cleared.');
+    }
+
+    function addLap() {
+      if (state.startTimeMs === null || !state.wagePerSecond) {
+        toast('Start a session first.');
+        return;
+      }
+
+      const elapsed = getElapsedSeconds();
+      const gross = getEarnedGross(elapsed);
+      const net = getEarnedNet(gross);
+      const ts = Date.now();
+
+      if (!Array.isArray(state.laps)) state.laps = [];
+      state.laps.push({
+        ts,
+        elapsedSeconds: elapsed,
+        gross: Number(gross.toFixed(6)),
+        net: net == null ? null : Number(net.toFixed(6)),
+      });
+
+      if (state.laps.length > 200) state.laps = state.laps.slice(-200);
+
+      renderLaps();
+      saveAppState();
+
+      toast(`Lap #${state.laps.length} • ${formatISODate(ts)} • ${formatTime(elapsed)} • ${formatCurrency(gross)}`);
+    }
+
+    function saveCurrentSession() {
+      if (state.startTimeMs === null || !state.wagePerSecond || !state.sessionId) {
+        toast('Nothing to save. Start tracking first.');
+        return;
+      }
+
+      const elapsed = getElapsedSeconds();
+      if (elapsed <= 0) {
+        toast('Session is 0 seconds. Let it run first.');
+        return;
+      }
+
+      const gross = getEarnedGross(elapsed);
+      const net = getEarnedNet(gross);
+
+      const payType = $('payType').value;
+      const hourlyRate = state.wagePerSecond * 3600;
+      const taxRatePercent = safeNum($('taxRate').value);
+
+      const session = {
+        id: state.sessionId,
+        endedAt: Date.now(),
+        elapsedSeconds: elapsed,
+        gross: Number(gross.toFixed(6)),
+        net: net == null ? null : Number(net.toFixed(6)),
+        rateHourly: Number(hourlyRate.toFixed(6)),
+        currency: state.currency,
+        taxRatePercent: taxRatePercent == null ? null : clamp(taxRatePercent, 0, 99),
+        payType,
+      };
+
+      const sessions = loadSessions();
+      sessions.push(session);
+      saveSessions(sessions.slice(-200));
+      renderSessionsTable();
+      toast('Session saved.');
+    }
+
+    function clearSavedSessions() {
+      if (!confirm('Delete all saved sessions? This cannot be undone.')) return;
+      localStorage.removeItem(SESSIONS_KEY);
+      renderSessionsTable();
+      toast('Saved sessions cleared.');
+    }
+
+    function calcCustomEarnings() {
+      const wps = computeWagePerSecond();
+      if (!wps || wps <= 0) {
+        $('customEarnings').textContent = 'Enter a valid wage/salary first.';
+        return;
+      }
+
+      const hrs = safeNum($('customHours').value) ?? 0;
+      const mins = safeNum($('customMinutes').value) ?? 0;
+      const secs = safeNum($('customSeconds').value) ?? 0;
+
+      const totalSeconds = Math.max(0, (hrs * 3600) + (mins * 60) + secs);
+      const gross = totalSeconds * wps;
+      const net = getEarnedNet(gross);
+
+      const tr = getTaxRateFraction();
+      if (tr !== null) {
+        $('customEarnings').textContent = `Gross: ${formatCurrency(gross)} • Net (est.): ${formatCurrency(net ?? gross)}`;
       } else {
-        pausedTime = Date.now();
-        paused = true;
+        $('customEarnings').textContent = `Gross: ${formatCurrency(gross)} (set tax rate to estimate net)`;
       }
     }
 
-    function restartTimer() {
-      if (wagePerSecond !== null) {
-        startTime = Date.now();
-        paused = false;
-      }
-    }
+    function tick() {
+      const wps = state.wagePerSecond;
 
-    function newSession() {
-      startTime = null;
-      wagePerSecond = null;
-      paused = false;
-      document.getElementById("wage").value = "";
-      document.getElementById("goal").value = "";
-      document.getElementById("timeWorked").textContent = "";
-      document.getElementById("moneyEarned").textContent = "";
-      document.getElementById("timeToGoal").textContent = "";
-      document.getElementById("presetStarbucks").textContent = "";
-      document.getElementById("presetCar").textContent = "";
-      document.getElementById("presetHouse").textContent = "";
-      document.getElementById("customEarnings").textContent = "";
-      document.getElementById("customHours").value = "";
-      document.getElementById("customMinutes").value = "";
-      document.getElementById("customSeconds").value = "";
-      document.title = "Live Pay Tracker";
-    }
+      const elapsed = getElapsedSeconds();
+      setTextIfChanged($('timeWorked'), formatTime(elapsed));
 
-    function toggleDarkMode() {
-      const body = document.body;
-      isDarkMode = !isDarkMode;
-      if (isDarkMode) {
-        body.style.backgroundColor = "#1e1e1e";
-        body.style.color = "#ffffff";
-        document.getElementById("darkModeToggle").textContent = "Toggle Light Mode";
+      const grossHourly = wps ? (wps * 3600) : 0;
+
+      const tr = getTaxRateFraction();
+      const showNet = tr !== null && wps;
+
+      if (showNet) {
+        const netHourly = grossHourly * (1 - tr);
+        setTextIfChanged($('rateKey'), 'Rate (gross • net)');
+        setTextIfChanged($('rateText'), `${formatCurrency(grossHourly)}/hr • ${formatCurrency(netHourly)}/hr`);
+        toggleHiddenIfChanged($('takeHomePill'), false);
+        setHTMLIfChanged($('takeHomePill'), `<strong>Take-home:</strong> ${formatCurrency(netHourly)}/hr`);
       } else {
-        body.style.backgroundColor = "#ffffff";
-        body.style.color = "#000000";
-        document.getElementById("darkModeToggle").textContent = "Toggle Dark Mode";
+        setTextIfChanged($('rateKey'), 'Rate');
+        setTextIfChanged($('rateText'), `${formatCurrency(grossHourly)}/hr`);
+        toggleHiddenIfChanged($('takeHomePill'), true);
       }
-    }
 
-    function toggleTimeMode() {
-      useCalendarTime = !useCalendarTime;
-      document.getElementById("timeModeToggle").textContent = useCalendarTime ? "Use Work Hours" : "Use Calendar Time";
-    }
+      const gross = getEarnedGross(elapsed);
+      setTextIfChanged($('moneyEarned'), formatCurrency(gross));
 
-    function calculateCustomEarnings() {
-      const hrs = parseFloat(document.getElementById("customHours").value) || 0;
-      const mins = parseFloat(document.getElementById("customMinutes").value) || 0;
-      const secs = parseFloat(document.getElementById("customSeconds").value) || 0;
-      const totalSeconds = hrs * 3600 + mins * 60 + secs;
-      if (wagePerSecond !== null) {
-        const earned = totalSeconds * wagePerSecond;
-        document.getElementById("customEarnings").textContent = `You would earn: $${earned.toFixed(2)}`;
-      } else {
-        document.getElementById("customEarnings").textContent = "Enter your hourly wage and start session first.";
+      const net = getEarnedNet(gross);
+      setDisplayIfChanged($('netRow'), showNet ? 'flex' : 'none');
+      if (showNet) setTextIfChanged($('moneyNet'), formatCurrency(net ?? 0));
+
+      updateGoalUI(elapsed, gross, net);
+
+      // Background-safe autosave: timestamp delta (works even with throttled tabs)
+      if (state.startTimeMs !== null && !state.paused) {
+        const nowMs = Date.now();
+        if (!state.lastSaveTimeMs) state.lastSaveTimeMs = nowMs;
+        if ((nowMs - state.lastSaveTimeMs) >= 5000) {
+          state.lastSaveTimeMs = nowMs;
+          saveAppState();
+        }
       }
+
+      updateSessionButtons(true);
+
+      setTimeout(tick, 1000);
     }
 
-    update();
+    function wireEvents() {
+      $('themeBtn').addEventListener('click', () => { toggleTheme(); saveAppState(); });
+
+      $('soundBtn').addEventListener('click', () => {
+        toggleSound();
+      });
+
+      $('timeModeBtn').addEventListener('click', () => {
+        state.timeMode = state.timeMode === 'work' ? 'calendar' : 'work';
+        applyTimeModeLabel();
+        updatePresets();
+        saveAppState();
+      });
+
+      $('precisionBtn').addEventListener('click', () => {
+        state.precisionMode = state.precisionMode === 'cents' ? 'millis' : 'cents';
+        applyPrecisionLabel();
+        saveAppState();
+        toast(state.precisionMode === 'millis' ? 'Precision: 0.001' : 'Precision: 0.01');
+      });
+
+      $('startBtn').addEventListener('click', startSession);
+      $('pauseBtn').addEventListener('click', togglePause);
+      $('restartBtn').addEventListener('click', restartSession);
+      $('newBtn').addEventListener('click', clearAll);
+      $('lapBtn').addEventListener('click', addLap);
+
+      $('calcBtn').addEventListener('click', calcCustomEarnings);
+
+      $('payType').addEventListener('change', () => {
+        applyPayTypeUI();
+        const wps = computeWagePerSecond();
+        state.wagePerSecond = wps;
+        updatePresets();
+        saveAppState();
+      });
+
+      $('currency').addEventListener('change', () => {
+        state.currency = $('currency').value;
+        updatePresets();
+        saveAppState();
+      });
+
+      $('salaryAnnual').addEventListener('input', saveAppState);
+      $('pph').addEventListener('input', saveAppState);
+      $('wage').addEventListener('input', saveAppState);
+
+      $('taxRate').addEventListener('input', () => {
+        updatePresets();
+        saveAppState();
+      });
+
+      $('goal').addEventListener('input', saveAppState);
+      $('goalNet').addEventListener('change', saveAppState);
+
+      $('presetUnit').addEventListener('change', () => { updatePresets(); saveAppState(); });
+
+      $('saveSessionBtn').addEventListener('click', saveCurrentSession);
+      $('exportCsvBtn').addEventListener('click', exportSessionsCSV);
+      $('clearSessionsBtn').addEventListener('click', clearSavedSessions);
+
+      window.addEventListener('beforeunload', saveAppState);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+          if (e.key === 'Escape') e.target.blur();
+          return;
+        }
+
+        if (e.code === 'Space') {
+          e.preventDefault();
+          if (state.startTimeMs === null) startSession();
+          else togglePause();
+        }
+        if (e.key.toLowerCase() === 'n') {
+          e.preventDefault();
+          clearAll();
+        }
+        if (e.key.toLowerCase() === 't') {
+          e.preventDefault();
+          toggleTheme();
+          saveAppState();
+        }
+        if (e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          addLap();
+        }
+      });
+    }
+
+    function init() {
+      applyThemeFromStorage();
+      loadSoundPref();
+      updateSoundBtn();
+      $('moneyEarned').textContent = formatCurrency(0);
+      $('moneyNet').textContent = formatCurrency(0);
+
+      loadAppState();
+      applyPayTypeUI();
+      renderLaps();
+      applyPrecisionLabel();
+      applyTimeModeLabel();
+
+      renderSessionsTable();
+      wireEvents();
+      updatePresets();
+      updateSessionButtons();
+
+      tick();
+    }
+
+    init();
   </script>
 </body>
 </html>
